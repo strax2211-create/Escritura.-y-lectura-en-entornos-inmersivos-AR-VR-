@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lectura y Escritura en Entornos Inmersivos (AR/VR)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Modo claro (default) */
+            --primary-color: #00f3ff;
+            --secondary-color: #ff00ff;
+            --accent-color: #00ff9d;
+            --dark-color: #0a0a1a;
+            --light-color: #f0f8ff;
+            --gray-color: #8a8fa3;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-border: rgba(0, 243, 255, 0.2);
+            --text-color: #e6f1ff;
+            --shadow-color: rgba(0, 243, 255, 0.3);
+            --transition: all 0.3s ease;
+            --neon-glow: 0 0 10px var(--primary-color), 0 0 20px var(--primary-color), 0 0 30px var(--primary-color);
+            --neon-text-glow: 0 0 5px #fff, 0 0 10px var(--primary-color);
+        }
+        
+        .light-mode {
+            --primary-color: #0066ff;
+            --secondary-color: #cc00ff;
+            --accent-color: #00cc66;
+            --dark-color: #f5f7ff;
+            --light-color: #0a0a1a;
+            --gray-color: #5a5f73;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --card-border: rgba(0, 102, 255, 0.2);
+            --text-color: #0a0a1a;
+            --shadow-color: rgba(0, 102, 255, 0.2);
+            --neon-glow: 0 0 10px rgba(0, 102, 255, 0.3);
+            --neon-text-glow: none;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--dark-color);
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 243, 255, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(255, 0, 255, 0.05) 0%, transparent 20%);
+            transition: var(--transition);
+        }
+        
+        h1, h2, h3, h4 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+            text-shadow: var(--neon-text-glow);
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+        }
+        
+        h2 {
+            font-size: 2.2rem;
+            color: var(--primary-color);
+            position: relative;
+            padding-bottom: 0.8rem;
+            text-shadow: var(--neon-text-glow);
+        }
+        
+        h2:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 2px;
+            box-shadow: 0 0 10px var(--primary-color);
+        }
+        
+        h3 {
+            font-size: 1.6rem;
+            color: var(--secondary-color);
+            text-shadow: 0 0 5px rgba(255, 0, 255, 0.3);
+        }
+        
+        p {
+            margin-bottom: 1.2rem;
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header */
+        header {
+            background: linear-gradient(135deg, rgba(10, 10, 26, 0.9) 0%, rgba(20, 25, 60, 0.9) 100%);
+            color: white;
+            padding: 4rem 0;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+        }
+        
+        header:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" opacity="0.05"><path d="M0 0h1200v600H0z" fill="none"/><g fill="%2300f3ff"><circle cx="300" cy="150" r="8"/><circle cx="800" cy="100" r="12"/><circle cx="1100" cy="400" r="10"/><circle cx="200" cy="450" r="15"/><circle cx="600" cy="500" r="9"/></g></svg>');
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .subtitle {
+            font-size: 1.3rem;
+            color: #b8c1ec;
+            margin-bottom: 2rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* Authors & Date */
+        .authors-date {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+            padding: 1rem 2rem;
+            background-color: rgba(0, 243, 255, 0.1);
+            border-radius: 15px;
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+        }
+        
+        .authors {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .author {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 500;
+        }
+        
+        .author i {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+        }
+        
+        .date {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            color: var(--secondary-color);
+            text-shadow: 0 0 5px rgba(255, 0, 255, 0.5);
+        }
+        
+        /* Theme Toggle Button */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(10, 10, 26, 0.8);
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            border-radius: 50px;
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            transition: var(--transition);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
+        }
+        
+        .theme-toggle:hover {
+            background: var(--primary-color);
+            color: var(--dark-color);
+            box-shadow: var(--neon-glow);
+            transform: rotate(30deg);
+        }
+        
+        /* Main Content */
+        main {
+            padding: 4rem 0;
+        }
+        
+        .intro-section {
+            margin-bottom: 4rem;
+            background-color: var(--card-bg);
+            padding: 3rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .intro-section:before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 243, 255, 0.05) 0%, transparent 70%);
+            z-index: -1;
+        }
+        
+        .feature-section {
+            margin-bottom: 5rem;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .feature-card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            transition: var(--transition);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(10px);
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-card:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 243, 255, 0.2);
+            border-color: var(--primary-color);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 10px var(--primary-color);
+        }
+        
+        .feature-list {
+            list-style-type: none;
+            margin: 1.5rem 0;
+        }
+        
+        .feature-list li {
+            padding: 0.5rem 0;
+            padding-left: 1.8rem;
+            position: relative;
+        }
+        
+        .feature-list li:before {
+            content: '▶';
+            position: absolute;
+            left: 0;
+            color: var(--accent-color);
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(0, 243, 255, 0.1) 0%, rgba(255, 0, 255, 0.1) 100%);
+            border-radius: 15px;
+            padding: 2.5rem;
+            margin: 2rem 0;
+            border-left: 5px solid var(--secondary-color);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .highlight-box:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.05"><path d="M0,0 L100,0 L100,100 Z" fill="%2300f3ff"/></svg>');
+            background-size: cover;
+        }
+        
+        .example-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .example-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
+            border: 1px solid var(--card-border);
+        }
+        
+        .example-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2), 0 0 10px rgba(0, 243, 255, 0.2);
+        }
+        
+        .example-icon {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            text-shadow: 0 0 5px var(--primary-color);
+        }
+        
+        /* VR Images - Todas diferentes */
+        .vr-image {
+            width: 100%;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            transition: var(--transition);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            height: 250px;
+            object-fit: cover;
+        }
+        
+        .vr-image:hover {
+            transform: scale(1.02);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 243, 255, 0.3);
+        }
+        
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .image-caption {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--gray-color);
+            margin-top: 0.5rem;
+            font-style: italic;
+            padding: 0.5rem;
+            background: rgba(0, 243, 255, 0.05);
+            border-radius: 5px;
+            border-left: 3px solid var(--accent-color);
+        }
+        
+        .image-with-caption {
+            margin: 1.5rem 0;
+        }
+        
+        /* Nuevos estilos para imágenes pequeñas en tarjetas */
+        .small-image {
+            height: 180px;
+            margin-top: 1rem;
+        }
+        
+        /* Conclusion */
+        .conclusion-section {
+            background: linear-gradient(135deg, rgba(10, 10, 26, 0.9) 0%, rgba(30, 20, 60, 0.9) 100%);
+            color: white;
+            padding: 4rem 0;
+            margin-top: 4rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 0, 255, 0.3);
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .conclusion-section:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.05"><polygon points="50,0 100,50 50,100 0,50" fill="%23ff00ff"/></svg>');
+            background-size: 200px;
+        }
+        
+        .conclusion-section h2 {
+            color: white;
+        }
+        
+        .conclusion-section h2:after {
+            background: var(--accent-color);
+        }
+        
+        .conclusion-content {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: rgba(10, 10, 26, 0.95);
+            color: #b8c1ec;
+            padding: 3rem 0;
+            text-align: center;
+            margin-top: 4rem;
+            border-top: 1px solid rgba(0, 243, 255, 0.3);
+        }
+        
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .tech-tag {
+            display: inline-block;
+            background-color: rgba(0, 243, 255, 0.1);
+            color: var(--primary-color);
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            margin: 0.5rem;
+            font-size: 0.9rem;
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            transition: var(--transition);
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 500;
+        }
+        
+        .tech-tag:hover {
+            background-color: rgba(0, 243, 255, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0, 243, 255, 0.2);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            h2 {
+                font-size: 1.8rem;
+            }
+            
+            .intro-section, .feature-card {
+                padding: 1.5rem;
+            }
+            
+            .header-content {
+                padding: 0 1rem;
+            }
+            
+            main {
+                padding: 2rem 0;
+            }
+            
+            .authors-date {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .theme-toggle {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+            
+            .small-image {
+                height: 150px;
+            }
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 10px rgba(0, 243, 255, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(0, 243, 255, 0.8); }
+            100% { box-shadow: 0 0 10px rgba(0, 243, 255, 0.5); }
+        }
+        
+        .animate {
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        /* Neon effects */
+        .neon-text {
+            text-shadow: 0 0 5px #fff, 0 0 10px var(--primary-color), 0 0 15px var(--primary-color);
+        }
+        
+        .neon-border {
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 0 10px var(--primary-color), inset 0 0 10px var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Theme Toggle Button -->
+    <div class="theme-toggle pulse" id="themeToggle">
+        <i class="fas fa-moon"></i>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content animate">
+                <h1>Lectura y Escritura en Entornos Inmersivos</h1>
+                <p class="subtitle">La evolución de las tecnologías digitales ha transformado profundamente la forma en que los seres humanos producen, interpretan y comparten información.</p>
+                
+                <div class="authors-date">
+                    <div class="authors">
+                        <div class="author">
+                            <i class="fas fa-user-astronaut"></i>
+                            <span>Stefano Cruz</span>
+                        </div>
+                        <div class="author">
+                            <i class="fas fa-user-astronaut"></i>
+                            <span>Ethan Rodríguez</span>
+                        </div>
+                    </div>
+                    <div class="date" id="currentDate">
+                        <!-- La fecha se insertará con JavaScript -->
+                    </div>
+                </div>
+                
+                <div style="margin-top: 2rem;">
+                    <span class="tech-tag"><i class="fas fa-vr-cardboard"></i> Realidad Virtual</span>
+                    <span class="tech-tag"><i class="fas fa-mobile-alt"></i> Realidad Aumentada</span>
+                    <span class="tech-tag"><i class="fas fa-book-reader"></i> Lectura Inmersiva</span>
+                    <span class="tech-tag"><i class="fas fa-pencil-alt"></i> Escritura Espacial</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <div class="container">
+            <!-- Introducción con imagen VR -->
+            <section class="intro-section animate">
+                <h2>La Revolución Inmersiva</h2>
+                <div class="image-grid">
+                    <div>
+                        <p>La realidad aumentada (AR) y la realidad virtual (VR) representan una de las revoluciones más importantes en el ámbito de la comunicación escrita y la lectura. Estas tecnologías no solo modifican los soportes tradicionales del texto, sino que también cambian la manera en que las personas perciben, interactúan y construyen significado a partir de la información.</p>
+                        <p>A diferencia de los libros impresos o las pantallas planas, los entornos inmersivos permiten que el lenguaje se integre directamente en el espacio que rodea al lector. El texto deja de ser un elemento estático para convertirse en una experiencia viva, tridimensional y multisensorial.</p>
+                    </div>
+                    <div class="image-with-caption">
+                        <img src="https://images.unsplash.com/photo-1593508512255-86ab42a8e620?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Gafas VR modernas con diseño futurista" class="vr-image">
+                        <p class="image-caption">Gafas VR de última generación - El portal hacia mundos virtuales donde el texto cobra vida en 3D.</p>
+                    </div>
+                </div>
+                
+                <!-- Imagen adicional en introducción -->
+                <div class="image-with-caption">
+                    <img src="https://images.unsplash.com/photo-1542744095-fcf48d80b0fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Tecnología holográfica avanzada" class="vr-image">
+                    <p class="image-caption">Pantallas holográficas que muestran cómo la información puede existir en el espacio 3D sin soportes físicos.</p>
+                </div>
+            </section>
+
+            <!-- Textos Espaciales -->
+            <section class="feature-section animate">
+                <h2>1. Textos Espaciales</h2>
+                <p>Uno de los cambios más importantes es la aparición de los textos espaciales. En la AR y la VR, las palabras ya no están limitadas a una página o pantalla, sino que pueden integrarse directamente en el entorno tridimensional.</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-arrows-alt"></i>
+                        </div>
+                        <h3>Flotar en el aire</h3>
+                        <p>El texto puede colocarse en cualquier punto del espacio, rodeando al usuario o flotando en posiciones específicas.</p>
+                        <div class="image-with-caption">
+                            <img src="https://images.unsplash.com/photo-1535223289827-42f1e9919769?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Gafas VR con pantalla holográfica" class="vr-image small-image">
+                            <p class="image-caption">Visión desde gafas VR avanzadas: texto flotando en un entorno virtual 3D como hologramas.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-sync-alt"></i>
+                        </div>
+                        <h3>Ajuste dinámico</h3>
+                        <p>Las palabras se adaptan al movimiento del usuario, cambiando de tamaño, color o posición según la interacción.</p>
+                        <div class="image-with-caption">
+                            <img src="https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Gafas VR con seguimiento ocular" class="vr-image small-image">
+                            <p class="image-caption">Gafas VR con sensores de movimiento y seguimiento ocular para ajuste dinámico del texto.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-project-diagram"></i>
+                        </div>
+                        <h3>Integración ambiental</h3>
+                        <p>El texto se convierte en parte del entorno, integrándose con el espacio virtual o real de manera natural.</p>
+                        <div class="image-with-caption">
+                            <img src="https://images.unsplash.com/photo-1542751110-97427bbecf20?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Gafas VR con realidad mixta" class="vr-image small-image">
+                            <p class="image-caption">Gafas de realidad mixta que permiten al texto integrarse completamente en el ambiente.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Imagen adicional en sección de textos espaciales -->
+                <div class="image-with-caption">
+                    <img src="https://images.unsplash.com/photo-1573164713714-d95e436ab99d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Interfaz de texto espacial 3D" class="vr-image">
+                    <p class="image-caption">Interfaz de usuario con texto organizado en el espacio 3D, permitiendo navegación no lineal.</p>
+                </div>
+                
+                <div class="highlight-box">
+                    <h3><i class="fas fa-lightbulb"></i> Lectura no lineal</h3>
+                    <p>Los textos espaciales permiten una lectura no lineal, donde el lector decide qué mirar, en qué orden y desde qué perspectiva. Esto rompe con la estructura tradicional de inicio–desarrollo–final, y abre paso a narrativas más dinámicas y exploratorias.</p>
+                    <div class="image-with-caption">
+                        <img src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Gafas VR para exploración 360°" class="vr-image">
+                        <p class="image-caption">Con gafas VR, el lector explora el contenido en 360°, rompiendo con la estructura lineal tradicional.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Experiencias de lectura inmersiva -->
+            <section class="feature-section animate">
+                <h2>2. Experiencias de Lectura Inmersiva</h2>
+                <p>La lectura en entornos AR/VR se convierte en una experiencia inmersiva, es decir, el lector no solo observa el texto, sino que "entra" en él. En lugar de leer sobre un bosque, el usuario puede encontrarse dentro de un bosque virtual mientras las palabras aparecen entre los árboles o en el cielo.</p>
+                
+                <div class="image-with-caption">
+                    <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="Gafas VR con entorno inmersivo" class="vr-image">
+                    <p class="image-caption">Gafas VR proporcionan inmersión total: el lector no solo lee sobre un entorno, sino que se encuentra dentro de él.</p>
+                </div>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h3>Aumenta la concentración</h3>
+                        <p>Al reducir distracciones externas y sumergir al lector en un entorno controlado, se mejora significativamente la capacidad de concentración.</p>
+                        <div class="image-with-caption">
+                            <img src="https://images.unsplash.com/photo-1518834103328-93d45986dce1?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Gafas VR aislantes para concentración" class="vr-image small-image">
+                            <p class="image-caption">Gafas VR crean entornos virtuales controlados que eliminan distracciones y aumentan la concentración.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <h3>Estimula la imaginación</h3>
+                        <p>La combinación de texto con imágenes, sonidos y ambientes tridimensionales potencia la capacidad imaginativa del lector.</p>
+                        <div class="image-with-caption">
+                            <img src="https://images.unsplash.com/photo-1593114970899-95c26e8d8841?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Gafas VR con estímulos multisensoriales" class="vr-image small-image">
+                            <p class="image-caption">Gafas VR que combinan texto con elementos visuales y auditivos para estimular la imaginación.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h3>Favorece la comprensión</h3>
+                        <p>Al relacionar conceptos abstractos con espacios visuales concretos, se facilita la comprensión y retención de información.</p>
+                        <div class="image-with-caption">
+                            <img src="https://images.unsplash.com/photo-1573804633927-bfcbcd909acd?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Gafas VR educativas" class="vr-image small-image">
+                            <p class="image-caption">Con gafas VR educativas, los conceptos complejos se representan visualmente para facilitar la comprensión.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Imagen adicional en sección de experiencias -->
+                <div class="image-with-caption">
+                    <img src="https://images.unsplash.com/photo-1551650975-87deedd944c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Entorno virtual educativo" class="vr-image">
+                    <p class="image-caption">Aula virtual donde los estudiantes interactúan con contenido educativo en un entorno 3D inmersivo.</p>
+                </div>
+                
+                <div class="highlight-box">
+                    <h3><i class="fas fa-hands"></i> Interactividad total</h3>
+                    <p>La lectura deja de ser pasiva y se vuelve interactiva. El usuario puede tocar palabras, abrir fragmentos ocultos, activar animaciones o cambiar el entorno según lo que lee. Así, el texto se transforma en una experiencia sensorial completa que combina vista, oído y movimiento.</p>
+                    <div class="image-with-caption">
+                        <img src="https://images.unsplash.com/photo-1516496636080-14fb876e029d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Gafas VR con controles manuales" class="vr-image">
+                        <p class="image-caption">Gafas VR con controles manuales permiten interacción directa con el texto y elementos virtuales.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Interacción contextual -->
+            <section class="feature-section animate">
+                <h2>3. Interacción Contextual con el Entorno</h2>
+                <p>El contenido escrito se adapta inteligentemente al lugar, objeto o situación donde se encuentra el usuario, permitiendo una lectura situada y altamente relevante.</p>
+                
+                <div class="image-grid">
+                    <div class="image-with-caption">
+                        <img src="https://images.unsplash.com/photo-1551650975-87deedd944c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Realidad aumentada en arquitectura" class="vr-image">
+                        <p class="image-caption">AR en arquitectura: información contextual superpuesta sobre planos y modelos 3D en tiempo real.</p>
+                    </div>
+                    <div class="image-with-caption">
+                        <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Gafas VR en entornos profesionales" class="vr-image">
+                        <p class="image-caption">Gafas VR profesionales utilizadas en entornos de trabajo para visualización de datos contextuales.</p>
+                    </div>
+                </div>
+                
+                <div class="example-grid">
+                    <div class="example-card">
+                        <div class="example-icon">
+                            <i class="fas fa-university"></i>
+                        </div>
+                        <h4>En museos</h4>
+                        <p>Al observar una pieza histórica, aparece automáticamente su información contextual y relevante.</p>
+                        <div class="image-with-caption">
+                            <img src="https://images.unsplash.com/photo-1542744095-fcf48d80b0fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="AR en museos interactivos" class="vr-image small-image">
+                            <p class="image-caption">Visitas guiadas con AR que muestran información histórica sobre artefactos.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="example-card">
+                        <div class="example-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <h4>En educación</h4>
+                        <p>Los estudiantes pueden explorar modelos anatómicos con anotaciones interactivas en tiempo real.</p>
+                        <div class="image-with-caption">
+                            <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="VR en educación médica" class="vr-image small-image">
+                            <p class="image-caption">Estudiantes de medicina utilizando VR para explorar anatomía humana en 3D.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="example-card">
+                        <div class="example-icon">
+                            <i class="fas fa-industry"></i>
+                        </div>
+                        <h4>En industria</h4>
+                        <p>Los técnicos reciben instrucciones paso a paso superpuestas directamente sobre los equipos.</p>
+                        <div class="image-with-caption">
+                            <img src="https://images.unsplash.com/photo-1593508512255-86ab42a8e620?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Gafas VR industriales" class="vr-image small-image">
+                            <p class="image-caption">Gafas VR industriales: instrucciones superpuestas en equipos para guiar procedimientos complejos.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="example-card">
+                        <div class="example-icon">
+                            <i class="fas fa-palette"></i>
+                        </div>
+                        <h4>En arte</h4>
+                        <p>Las obras muestran explicaciones, contextos históricos y detalles técnicos al ser observadas.</p>
+                        <div class="image-with-caption">
+                            <img src="https://images.unsplash.com/photo-1516496636080-14fb876e029d?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="AR en galerías de arte" class="vr-image small-image">
+                            <p class="image-caption">Experiencias de AR en museos que revelan detalles ocultos de obras de arte.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="highlight-box">
+                    <h3><i class="fas fa-layer-group"></i> Capa informativa sobre la realidad</h3>
+                    <p>El texto ya no es algo separado de la realidad, sino una capa informativa que se superpone al mundo físico. En VR, el contexto también se adapta: el texto cambia según el escenario virtual, el nivel del usuario o las decisiones que tome durante la experiencia.</p>
+                    <div class="image-with-caption">
+                        <img src="https://images.unsplash.com/photo-1542751110-97427bbecf20?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Realidad aumentada urbana" class="vr-image">
+                        <p class="image-caption">AR urbana: información contextual sobre edificios y puntos de interés en tiempo real.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Información proyectada -->
+            <section class="feature-section animate">
+                <h2>4. Información Proyectada sobre Objetos Reales</h2>
+                <p>La AR permite superponer información directamente sobre objetos del mundo real, transformando cualquier elemento en una fuente de conocimiento interactiva.</p>
+                
+                <div class="feature-card" style="max-width: 800px; margin: 2rem auto;">
+                    <div class="feature-icon" style="text-align: center;">
+                        <i class="fas fa-eye"></i>
+                        <i class="fas fa-long-arrow-alt-right"></i>
+                        <i class="fas fa-cube"></i>
+                    </div>
+                    <h3 style="text-align: center;">De objeto físico a fuente de información</h3>
+                    <p>Este enfoque elimina la necesidad de manuales impresos o pantallas externas, integrando la información directamente en el contexto de uso. La AR convierte cualquier objeto en una interfaz natural de acceso al conocimiento.</p>
+                    
+                    <div class="image-with-caption">
+                        <img src="https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Gafas AR para información proyectada" class="vr-image">
+                        <p class="image-caption">Gafas AR superponen información directamente sobre objetos del mundo real mediante realidad aumentada.</p>
+                    </div>
+                    
+                    <ul class="feature-list">
+                        <li>Museos donde las piezas muestran datos históricos al ser observadas</li>
+                        <li>Educación para señalar partes de un cuerpo humano, un motor o una planta</li>
+                        <li>Industria para guiar procesos complejos paso a paso</li>
+                        <li>Turismo con información contextual sobre monumentos y lugares</li>
+                        <li>Medicina con visualización de datos médicos superpuestos al paciente</li>
+                    </ul>
+                    
+                    <!-- Imágenes adicionales en esta sección -->
+                    <div class="image-grid">
+                        <div class="image-with-caption">
+                            <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="AR en medicina" class="vr-image">
+                            <p class="image-caption">Aplicaciones médicas de AR: visualización de anatomía superpuesta al paciente.</p>
+                        </div>
+                        <div class="image-with-caption">
+                            <img src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="AR en mantenimiento industrial" class="vr-image">
+                            <p class="image-caption">Técnicos usando AR para mantenimiento de equipos complejos con guías paso a paso.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <!-- Conclusión -->
+        <section class="conclusion-section">
+            <div class="container">
+                <div class="conclusion-content animate">
+                    <h2>Conclusión</h2>
+                    <p>La realidad aumentada y la realidad virtual no solo modernizan la lectura y la escritura, sino que las reinventan por completo. Los textos se vuelven espaciales, la lectura se transforma en una experiencia inmersiva y el entorno se convierte en parte activa del proceso comunicativo.</p>
+                    <div class="image-with-caption">
+                        <img src="https://images.unsplash.com/photo-1542744095-fcf48d80b0fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Futuro de la tecnología inmersiva" class="vr-image">
+                        <p class="image-caption">El futuro de la lectura: tecnologías inmersivas que permiten textos integrados en nuestro entorno y vivir las palabras en 3D.</p>
+                    </div>
+                    <p style="margin-top: 1.5rem; font-size: 1.2rem; font-weight: 500;">Estas tecnologías anuncian un futuro donde leer ya no será solo mirar palabras, sino vivirlas dentro de un mundo interactivo y multidimensional que se adapta a nuestras necesidades, contextos y formas de aprendizaje.</p>
+                    <div style="margin-top: 2.5rem; text-align: center;">
+                        <div style="display: inline-block; background-color: rgba(255,255,255,0.1); padding: 1rem 2rem; border-radius: 50px; border: 1px solid rgba(0, 255, 157, 0.3);">
+                            <i class="fas fa-quote-left" style="color: var(--accent-color); margin-right: 0.5rem;"></i>
+                            <span style="font-style: italic;" class="neon-text">La próxima revolución de la comunicación ya está aquí</span>
+                            <i class="fas fa-quote-right" style="color: var(--accent-color); margin-left: 0.5rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <h3 style="color: var(--primary-color); margin-bottom: 1.5rem; text-shadow: 0 0 10px var(--primary-color);">Tecnologías del Futuro de la Lectura</h3>
+                <div style="margin-bottom: 2rem;">
+                    <span class="tech-tag">Realidad Aumentada (AR)</span>
+                    <span class="tech-tag">Realidad Virtual (VR)</span>
+                    <span class="tech-tag">Textos Espaciales</span>
+                    <span class="tech-tag">Interacción 3D</span>
+                    <span class="tech-tag">Interfaces Inmersivas</span>
+                </div>
+                <div class="authors" style="justify-content: center; margin-bottom: 1rem;">
+                    <div class="author">
+                        <i class="fas fa-user-astronaut"></i>
+                        <span>Stefano Cruz</span>
+                    </div>
+                    <div style="margin: 0 1rem; color: var(--primary-color);">•</div>
+                    <div class="author">
+                        <i class="fas fa-user-astronaut"></i>
+                        <span>Ethan Rodríguez</span>
+                    </div>
+                </div>
+                <p style="color: #b8c1ec; font-size: 0.9rem; max-width: 600px; margin: 0 auto;">© <span id="currentYear"></span> - Explorando el futuro de la lectura y escritura en entornos inmersivos. Este contenido está disponible para uso educativo y de divulgación tecnológica.</p>
+                <p style="margin-top: 1.5rem; color: #8a93b5; font-size: 0.8rem;">
+                    <i class="fas fa-laptop-code"></i> Página web desarrollada con HTML5, CSS3 y JavaScript
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Obtener y mostrar fecha actual
+        const currentDateElement = document.getElementById('currentDate');
+        const currentYearElement = document.getElementById('currentYear');
+        const now = new Date();
+        
+        const options = { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        };
+        
+        currentDateElement.textContent = now.toLocaleDateString('es-ES', options);
+        currentYearElement.textContent = now.getFullYear();
+        
+        // Toggle modo claro/oscuro
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        
+        themeToggle.addEventListener('click', function() {
+            body.classList.toggle('light-mode');
+            
+            if (body.classList.contains('light-mode')) {
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                themeToggle.style.borderColor = '#0066ff';
+                themeToggle.style.color = '#0066ff';
+                themeToggle.style.boxShadow = '0 0 15px rgba(0, 102, 255, 0.5)';
+            } else {
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                themeToggle.style.borderColor = '#00f3ff';
+                themeToggle.style.color = '#00f3ff';
+                themeToggle.style.boxShadow = '0 0 15px rgba(0, 243, 255, 0.5)';
+            }
+        });
+        
+        // Animación de elementos al hacer scroll
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animación de elementos al aparecer en pantalla
+            const animateOnScroll = function() {
+                const elements = document.querySelectorAll('.animate');
+                
+                elements.forEach(element => {
+                    const elementPosition = element.getBoundingClientRect().top;
+                    const screenPosition = window.innerHeight / 1.2;
+                    
+                    if (elementPosition < screenPosition) {
+                        element.style.opacity = '1';
+                        element.style.transform = 'translateY(0)';
+                    }
+                });
+            };
+            
+            // Configurar elementos para animación
+            const animatedElements = document.querySelectorAll('.animate');
+            animatedElements.forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+            });
+            
+            // Ejecutar al cargar y al hacer scroll
+            window.addEventListener('scroll', animateOnScroll);
+            animateOnScroll();
+            
+            // Efecto interactivo para las tarjetas
+            const featureCards = document.querySelectorAll('.feature-card');
+            featureCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    const icon = this.querySelector('.feature-icon i');
+                    if (icon) {
+                        icon.style.transform = 'scale(1.1) rotate(5deg)';
+                        icon.style.transition = 'transform 0.3s ease';
+                        icon.style.textShadow = '0 0 15px var(--primary-color)';
+                    }
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    const icon = this.querySelector('.feature-icon i');
+                    if (icon) {
+                        icon.style.transform = 'scale(1) rotate(0deg)';
+                        icon.style.textShadow = '0 0 10px var(--primary-color)';
+                    }
+                });
+            });
+            
+            // Efecto de pulso intermitente para elementos con clase .pulse
+            const pulseElements = document.querySelectorAll('.pulse');
+            pulseElements.forEach(el => {
+                setInterval(() => {
+                    el.classList.toggle('pulse');
+                }, 3000);
+            });
+            
+            // Cambio de color dinámico en el header
+            const header = document.querySelector('header');
+            window.addEventListener('scroll', function() {
+                const scrollPosition = window.scrollY;
+                if (scrollPosition > 50) {
+                    header.style.opacity = '0.95';
+                } else {
+                    header.style.opacity = '1';
+                }
+            });
+            
+            // Efecto de escritura para el título principal
+            const title = document.querySelector('h1');
+            const originalText = title.innerHTML;
+            title.innerHTML = '';
+            
+            let i = 0;
+            function typeWriter() {
+                if (i < originalText.length) {
+                    title.innerHTML += originalText.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, 50);
+                } else {
+                    // Una vez completado, restaurar el efecto de brillo
+                    title.classList.add('neon-text');
+                }
+            }
+            
+            // Iniciar efecto de escritura después de un breve retraso
+            setTimeout(typeWriter, 500);
+            
+            // Relación interactiva imágenes-texto
+            const images = document.querySelectorAll('.vr-image');
+            images.forEach(image => {
+                image.addEventListener('mouseenter', function() {
+                    const caption = this.nextElementSibling;
+                    if (caption && caption.classList.contains('image-caption')) {
+                        caption.style.transform = 'translateY(0)';
+                        caption.style.opacity = '1';
+                    }
+                });
+                
+                image.addEventListener('mouseleave', function() {
+                    const caption = this.nextElementSibling;
+                    if (caption && caption.classList.contains('image-caption')) {
+                        caption.style.transform = 'translateY(10px)';
+                        caption.style.opacity = '0.8';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
